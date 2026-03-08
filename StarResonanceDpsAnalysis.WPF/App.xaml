@@ -24,9 +24,6 @@
                 <ResourceDictionary Source="pack://application:,,,/Styles/CustomProgressBarStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Styles/SummaryStatDisplayStyle.xaml" />
 
-                <!--  Load SortedDpsControl default style  -->
-                <ResourceDictionary Source="pack://application:,,,/Styles/SortedDpsControlStyle.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Styles/DpsIndicatorControlStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Styles/ImageResourceDictionary.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Styles/CardHeaderStyle.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Styles/SimpleColorPickerStyle.xaml" />
