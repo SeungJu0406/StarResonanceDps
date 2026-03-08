@@ -124,9 +124,36 @@
                 </Button>
             </Border>
 
+            <!-- 스킬 목록 영역 -->
+            <Grid Grid.Row="2">
+
+            <!-- 빈 상태 안내 텍스트 -->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Margin="20">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsEmpty}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="추적 중인 스킬이 없습니다"
+                           Foreground="#CCCCCC"
+                           FontSize="13"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="'이름 추적' 버튼을 누른 후 스킬을 사용하세요"
+                           Foreground="#DDDDDD"
+                           FontSize="11"
+                           TextAlignment="Center"
+                           Margin="0,6,0,0"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+
             <!-- 스킬 목록 -->
-            <ListBox Grid.Row="2"
-                     ItemsSource="{Binding TrackedSkills}"
+            <ListBox ItemsSource="{Binding TrackedSkills}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      BorderThickness="0"
                      Padding="10,0"
@@ -234,37 +261,9 @@
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-
-                <!-- 비어있을 때 안내 텍스트 -->
-                <ListBox.Style>
-                    <Style TargetType="ListBox">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding TrackedSkills.Count}" Value="0">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBox">
-                                            <Border Padding="20">
-                                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                    <TextBlock Text="추적 중인 스킬이 없습니다"
-                                                               Foreground="#CCCCCC"
-                                                               FontSize="13"
-                                                               HorizontalAlignment="Center"/>
-                                                    <TextBlock Text="'이름 추적' 버튼을 누른 후&#10;스킬을 사용하세요"
-                                                               Foreground="#DDDDDD"
-                                                               FontSize="11"
-                                                               TextAlignment="Center"
-                                                               Margin="0,6,0,0"
-                                                               HorizontalAlignment="Center"/>
-                                                </StackPanel>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.Style>
             </ListBox>
+
+            </Grid>
 
             <!-- Footer -->
             <Border Grid.Row="3" Padding="15,10"
