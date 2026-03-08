@@ -4,6 +4,7 @@ using StarResonanceDpsAnalysis.WPF.Models;
 using StarResonanceDpsAnalysis.WPF.Services;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 
 namespace StarResonanceDpsAnalysis.WPF.ViewModels;
