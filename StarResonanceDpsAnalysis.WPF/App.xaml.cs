@@ -14,6 +14,7 @@ using StarResonanceDpsAnalysis.WPF.Logging;
 using StarResonanceDpsAnalysis.WPF.Plugins;
 using StarResonanceDpsAnalysis.WPF.Plugins.Interfaces;
 using StarResonanceDpsAnalysis.WPF.Services;
+using StarResonanceDpsAnalysis.WPF.SkillCounter;
 using StarResonanceDpsAnalysis.WPF.Themes;
 using StarResonanceDpsAnalysis.WPF.ViewModels;
 using StarResonanceDpsAnalysis.WPF.ViewModels.DpsStatisticDataEngine;
@@ -32,7 +33,9 @@ public partial class App : Application
         { typeof(SkillBreakdownViewModel), ServiceLifetime.Transient },
         { typeof(SkillBreakdownView), ServiceLifetime.Transient },
         { typeof(PlayerInfoDebugViewModel), ServiceLifetime.Transient },
-        { typeof(PlayerInfoDebugView), ServiceLifetime.Transient }
+        { typeof(PlayerInfoDebugView), ServiceLifetime.Transient },
+        { typeof(SkillCounterViewModel), ServiceLifetime.Singleton },
+        { typeof(SkillCounterView), ServiceLifetime.Singleton },
     };
 
     public static IHost? Host { get; private set; }
@@ -65,6 +68,11 @@ public partial class App : Application
 
         app.MainWindow = Host.Services.GetRequiredService<DpsStatisticsView>();
         app.MainWindow.Visibility = Visibility.Visible;
+
+        // 스킬 카운터 오버레이 표시
+        var skillCounterView = Host.Services.GetRequiredService<SkillCounterView>();
+        skillCounterView.Show();
+
         app.Run();
 
         // Centralized shutdown
@@ -150,6 +158,9 @@ public partial class App : Application
                 services.AddSingleton<ITopmostService, TopmostService>();
                 services.AddSingleton<DataSourceEngine>();
                 RegisterBuiltInPlugins(services);
+
+                // 스킬 카운터 서비스
+                services.AddSingleton<SkillCounterConfigService>();
 
                 services.AddSingleton<IPluginManager, PluginManager>();
                 services.AddSingleton<ITrayService, TrayService>();
