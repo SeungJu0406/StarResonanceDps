@@ -1,0 +1,315 @@
+<Window x:Class="StarResonanceDpsAnalysis.WPF.Views.SkillTrackerView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:StarResonanceDpsAnalysis.WPF.ViewModels"
+        xmlns:models="clr-namespace:StarResonanceDpsAnalysis.WPF.Models"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance vm:SkillTrackerViewModel}"
+        Title="스킬 추적기" Height="500" Width="420"
+        Style="{StaticResource TransparentWindow}"
+        ResizeMode="CanResizeWithGrip">
+
+    <Window.Resources>
+        <!-- Colors -->
+        <SolidColorBrush x:Key="TBgBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="TCardBrush" Color="#F5F5F5"/>
+        <SolidColorBrush x:Key="TBorderBrush" Color="#E0E0E0"/>
+        <SolidColorBrush x:Key="TAccentBrush" Color="#FF9F0A"/>
+        <SolidColorBrush x:Key="TAccentWaitBrush" Color="#2196F3"/>
+        <SolidColorBrush x:Key="TTextMainBrush" Color="#333333"/>
+        <SolidColorBrush x:Key="TTextSubBrush" Color="#888888"/>
+
+        <!-- ScrollBar -->
+        <Style x:Key="ThinScrollBar" TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="6"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid Background="Transparent">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb>
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Border CornerRadius="3" Background="#BBBBBB"/>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="{StaticResource TBgBrush}"
+            BorderBrush="{StaticResource TBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Margin="5">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2" Color="#AAAAAA"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header (드래그) -->
+            <Border Grid.Row="0" Padding="20,14" MouseDown="Header_MouseDown" Background="Transparent">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="{StaticResource TAccentBrush}" Width="4" Height="16" CornerRadius="2" Margin="0,0,10,0"/>
+                    <TextBlock Text="스킬 추적기"
+                               Foreground="{StaticResource TTextMainBrush}"
+                               FontWeight="Bold" FontSize="16"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 이름 추적 버튼 -->
+            <Border Grid.Row="1" Padding="15,0,15,12">
+                <Button Command="{Binding StartTrackingCommand}"
+                        Height="40" Cursor="Hand"
+                        BorderThickness="0">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Background" Value="{StaticResource TAccentBrush}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="Bd"
+                                                Background="{TemplateBinding Background}"
+                                                CornerRadius="6">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Opacity" Value="0.85"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="Bd" Property="Opacity" Value="0.7"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <!-- 대기 중일 때 파란색 -->
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsWaiting}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource TAccentWaitBrush}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <TextBlock FontWeight="Bold" FontSize="13" Foreground="White">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock" BasedOn="{StaticResource NormalTextBlockBaseStyle}">
+                                <Setter Property="Text" Value="🎯 이름 추적"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsWaiting}" Value="True">
+                                        <Setter Property="Text" Value="⏳ 스킬 사용 대기 중... (취소)"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Button>
+            </Border>
+
+            <!-- 스킬 목록 -->
+            <ListBox Grid.Row="2"
+                     ItemsSource="{Binding TrackedSkills}"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     BorderThickness="0"
+                     Padding="10,0"
+                     Background="Transparent">
+                <ListBox.Resources>
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource ThinScrollBar}"/>
+                </ListBox.Resources>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0,3"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="Bd" Background="{StaticResource TCardBrush}" CornerRadius="5">
+                                        <ContentPresenter/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="#EBEBEB"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:SkillTrackerItem}">
+                        <Grid Height="52">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- 왼쪽 컬러 바 -->
+                            <Border Grid.Column="0" Background="{StaticResource TAccentBrush}" CornerRadius="5,0,0,5"/>
+
+                            <!-- 스킬 정보 -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="14,0,8,0">
+                                <TextBlock Text="{Binding SkillName}"
+                                           Foreground="{StaticResource TTextMainBrush}"
+                                           FontWeight="SemiBold"
+                                           FontSize="13"/>
+                                <TextBlock Foreground="{StaticResource TTextSubBrush}"
+                                           FontSize="11"
+                                           Margin="0,2,0,0">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="총 피해: {0:N0}">
+                                            <Binding Path="TotalDamage"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!-- 사용 횟수 -->
+                            <Border Grid.Column="2" VerticalAlignment="Center" Margin="0,0,8,0">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding Count}"
+                                               FontSize="20"
+                                               FontWeight="Bold"
+                                               FontFamily="Consolas"
+                                               Foreground="{StaticResource TAccentBrush}"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Text="회"
+                                               FontSize="9"
+                                               Foreground="{StaticResource TTextSubBrush}"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 삭제 버튼 -->
+                            <Button Grid.Column="3"
+                                    Command="{Binding DataContext.RemoveSkillCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                    CommandParameter="{Binding}"
+                                    Width="30" Height="30"
+                                    Margin="0,0,10,0"
+                                    VerticalAlignment="Center"
+                                    Cursor="Hand"
+                                    BorderThickness="0"
+                                    Background="Transparent"
+                                    ToolTip="삭제">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="Bd" CornerRadius="4" Background="Transparent">
+                                            <TextBlock Text="✕"
+                                                       Foreground="#BBBBBB"
+                                                       FontSize="13"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Bd" Property="Background" Value="#FFDDDD"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <!-- 비어있을 때 안내 텍스트 -->
+                <ListBox.Style>
+                    <Style TargetType="ListBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TrackedSkills.Count}" Value="0">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBox">
+                                            <Border Padding="20">
+                                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock Text="추적 중인 스킬이 없습니다"
+                                                               Foreground="#CCCCCC"
+                                                               FontSize="13"
+                                                               HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="'이름 추적' 버튼을 누른 후&#10;스킬을 사용하세요"
+                                                               Foreground="#DDDDDD"
+                                                               FontSize="11"
+                                                               TextAlignment="Center"
+                                                               Margin="0,6,0,0"
+                                                               HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.Style>
+            </ListBox>
+
+            <!-- Footer -->
+            <Border Grid.Row="3" Padding="15,10"
+                    Background="#FAFAFA"
+                    BorderBrush="{StaticResource TBorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,4,4">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding TrackedSkills.Count, StringFormat='추적 스킬: {0}개'}"
+                               Foreground="{StaticResource TTextSubBrush}"
+                               FontSize="11"
+                               VerticalAlignment="Center"/>
+
+                    <!-- 전체 초기화 버튼 -->
+                    <Button Grid.Column="1"
+                            Command="{Binding ClearCommand}"
+                            Height="32" Padding="14,0"
+                            Cursor="Hand"
+                            BorderThickness="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd" CornerRadius="5" Background="#EEEEEE">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#E0E0E0"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#D0D0D0"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <TextBlock Text="전체 초기화"
+                                   Foreground="{StaticResource TTextMainBrush}"
+                                   FontSize="12"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

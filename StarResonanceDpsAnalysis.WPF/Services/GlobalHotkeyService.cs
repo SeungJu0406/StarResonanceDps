@@ -4,7 +4,6 @@ using System.Windows.Input;
 using Microsoft.Extensions.Logging;
 using StarResonanceDpsAnalysis.WPF.Config;
 using StarResonanceDpsAnalysis.WPF.Helpers;
-using StarResonanceDpsAnalysis.WPF.ViewModels;
 
 namespace StarResonanceDpsAnalysis.WPF.Services;
 
@@ -14,8 +13,7 @@ public sealed partial class GlobalHotkeyService(
     IMousePenetrationService mousePenetration,
     ITopmostService topmostService,
     IWindowManagementService windowManager,
-    DpsStatisticsViewModel dpsStatisticsViewModel,
-    PersonalDpsViewModel personalDpsViewModel)
+    ISkillTrackerService skillTrackerService)
     : IGlobalHotkeyService
 {
     private const int WM_KEYDOWN = 0x0100;
@@ -205,13 +203,10 @@ public sealed partial class GlobalHotkeyService(
     {
         try
         {
-            var dpsWindow = windowManager.DpsStatisticsView;
-            var personalWindow = windowManager.PersonalDpsView;
+            var trackerWindow = windowManager.SkillTrackerView;
+            topmostService.ToggleTopmost(trackerWindow);
 
-            topmostService.ToggleTopmost(dpsWindow);
-            topmostService.ToggleTopmost(personalWindow);
-
-            _config.TopmostEnabled = dpsWindow.Topmost;
+            _config.TopmostEnabled = trackerWindow.Topmost;
             _ = configManager.SaveAsync(_config);
 
             logger.LogInformation("TopMostService: Top most state changed to {State}", _config.TopmostEnabled ? "Enabled" : "Disabled");
@@ -226,8 +221,7 @@ public sealed partial class GlobalHotkeyService(
     {
         try
         {
-            personalDpsViewModel.Clear();
-            dpsStatisticsViewModel.ResetAll();
+            skillTrackerService.Clear();
         }
         catch (Exception ex)
         {

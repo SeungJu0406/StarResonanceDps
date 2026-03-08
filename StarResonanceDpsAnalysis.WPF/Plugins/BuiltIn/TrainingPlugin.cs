@@ -34,7 +34,7 @@ internal class TrainingPlugin_NotInUse : IPlugin
 
     public void OnRequestRun()
     {
-        _windowManagementService.PersonalDpsView.Show();
+        _windowManagementService.SkillTrackerView.Show();
     }
 
     public void OnRequestSetting()

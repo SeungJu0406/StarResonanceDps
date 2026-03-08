@@ -20,7 +20,6 @@ public static class MouseThroughHelper
     /// </summary>
     public static void ApplyToCoreWindows(AppConfig config, IWindowManagementService windowManager, IMousePenetrationService mousePenetrationService)
     {
-        Apply(windowManager.DpsStatisticsView, config.MouseThroughEnabled, mousePenetrationService);
-        Apply(windowManager.PersonalDpsView, config.MouseThroughEnabled, mousePenetrationService);
+        Apply(windowManager.SkillTrackerView, config.MouseThroughEnabled, mousePenetrationService);
     }
 }

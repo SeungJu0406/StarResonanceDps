@@ -17,7 +17,6 @@ using StarResonanceDpsAnalysis.WPF.Services;
 using StarResonanceDpsAnalysis.WPF.SkillCounter;
 using StarResonanceDpsAnalysis.WPF.Themes;
 using StarResonanceDpsAnalysis.WPF.ViewModels;
-using StarResonanceDpsAnalysis.WPF.ViewModels.DpsStatisticDataEngine;
 using StarResonanceDpsAnalysis.WPF.Views;
 
 namespace StarResonanceDpsAnalysis.WPF;
@@ -28,8 +27,8 @@ public partial class App : Application
 
     private static readonly Dictionary<Type, ServiceLifetime> LifeTimeOverrides = new()
     {
-        { typeof(DpsStatisticsViewModel), ServiceLifetime.Singleton },
-        { typeof(DpsStatisticsView), ServiceLifetime.Singleton },
+        { typeof(SkillTrackerViewModel), ServiceLifetime.Singleton },
+        { typeof(SkillTrackerView), ServiceLifetime.Singleton },
         { typeof(SkillBreakdownViewModel), ServiceLifetime.Transient },
         { typeof(SkillBreakdownView), ServiceLifetime.Transient },
         { typeof(PlayerInfoDebugViewModel), ServiceLifetime.Transient },
@@ -66,7 +65,7 @@ public partial class App : Application
         var appStartup = Host.Services.GetRequiredService<IApplicationStartup>();
         appStartup.InitializeAsync().Wait();
 
-        app.MainWindow = Host.Services.GetRequiredService<DpsStatisticsView>();
+        app.MainWindow = Host.Services.GetRequiredService<SkillTrackerView>();
         app.MainWindow.Visibility = Visibility.Visible;
 
         // 스킬 카운터 오버레이 표시
@@ -141,11 +140,9 @@ public partial class App : Application
                 services.AddClassColorService();
                 services.AddSingleton<IAutoUpdateService, AppUpdateService>();
 
-                // ? Register new DPS services (SOLID refactoring)
-                services.AddDpsServices();
-
                 services.AddSingleton<BattleHistoryService>();
                 services.AddSingleton<ISkillLogService, SkillLogService>();
+                services.AddSingleton<ISkillTrackerService, SkillTrackerService>();
 
                 services.AddSingleton<DebugFunctions>();
                 services.AddSingleton(CaptureDeviceList.Instance);
@@ -156,7 +153,6 @@ public partial class App : Application
                 services.AddSingleton<IGlobalHotkeyService, GlobalHotkeyService>();
                 services.AddSingleton<IMousePenetrationService, MousePenetrationService>();
                 services.AddSingleton<ITopmostService, TopmostService>();
-                services.AddSingleton<DataSourceEngine>();
                 RegisterBuiltInPlugins(services);
 
                 // 스킬 카운터 서비스
