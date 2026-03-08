@@ -182,13 +182,6 @@ public partial class AppConfig : ObservableObject
     private int _maxHistoryCount = 15;
 
     /// <summary>
-    /// 打桩模式默认木桩类型
-    /// 默认值：Center (中间木桩)
-    /// </summary>
-    [ObservableProperty]
-    private DummyTargetType _defaultDummyTarget = DummyTargetType.Center; // 0=Center, 1=TDummy
-
-    /// <summary>
     /// DPS统计页面 - 技能显示数量
     /// 默认值：8条
     /// </summary>
